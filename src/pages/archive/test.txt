@@ -1,0 +1,19 @@
+{/* 💡 判定された画像配列を安全にループ展開 */}
+            {images.length > 0 && (
+              <Grid item className={classes.imageWrapper}>
+                <Grid container direction="column">
+                  {images.map((img: any, index: number) => (
+                    <Grid item key={index}>
+                      {img?.url && (
+                        <img 
+                          src={img.url} 
+                          alt={`${post.title} - ${index + 1}`} 
+                          className={classes.archiveImage} 
+                        />
+                      )}
+                    </Grid>
+                  ))}
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
