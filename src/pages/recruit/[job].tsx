@@ -5,7 +5,7 @@ import Qualifications from "../../components/recruit/Qualifications"
 import { Container, Grid, Typography} from "@mui/material"
 import PageTemplate from "../../components/layouts/PageTemplate"
 import theme from "../../components/utils/theme"
-import { jobDetails } from "./jobDetails"
+import { jobDetails } from "../../data/jobDetails"
 
 const useStyles = makeStyles(() => ({
   container: {

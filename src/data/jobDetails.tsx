@@ -1,4 +1,4 @@
-import { JobDetail } from "./[job]";
+import { JobDetail } from "../pages/recruit/[job]";
 
 export const jobDetails: JobDetail[] = [
   {
@@ -56,7 +56,7 @@ export const jobDetails: JobDetail[] = [
       "演題：「豐田佐吉記念館での20年間を振り返って」",
       "実施期：令和7年5月25日（日）　　参加者：30名"
 
-    ],　
+    ],
     idealImages: [
       "講演会への参加会費は無料です。講演者への謝礼は学ぶ会会計から支出されます。"
     ]
