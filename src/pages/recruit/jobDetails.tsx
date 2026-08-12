@@ -79,3 +79,5 @@ export const jobDetails: JobDetail[] = [
     ]
   }
 ];
+
+export default jobDetails
