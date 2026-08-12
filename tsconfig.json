@@ -8,8 +8,8 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node", /* ★Next.jsの指示通り"node"にする */
-    "ignoreDeprecations": "6.0",
+    "moduleResolution": "bundler", /* ★Next.jsの指示通り"node"にする 
+    "ignoreDeprecations": "6.0",*/
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
