@@ -97,7 +97,16 @@ const ArchiveId = ({ post }: ArchivePostData) => {
                 {moment(displayDate).format("MMMM Do YYYY")}
               </Typography>
             </Grid>
-
+ <Container className={classes.container}>
+          <Grid container direction="column">
+            <Grid item>
+              <div
+                className={classes.bodyContent}
+                dangerouslySetInnerHTML={{ __html: `${post.body || ''}` }}
+              />
+            </Grid>
+          </Grid>
+        </Container>
             {images.length > 0 && (
               <Grid item className={classes.imageWrapper}>
                 <Grid container direction="row" spacing={2}>

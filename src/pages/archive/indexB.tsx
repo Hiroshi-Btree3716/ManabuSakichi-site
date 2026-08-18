@@ -1,15 +1,13 @@
-// pages/archive/index.tsx
-import { GetStaticProps } from "next"
-import { ThemeProvider } from "@mui/styles"
-import { makeStyles } from "@mui/styles"
-import { Container, Typography, Card, CardContent, Box, Button, Chip } from "@mui/material"
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import DescriptionIcon from '@mui/icons-material/Description'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+// pages/archive/[id].tsx
+import { GetStaticPaths, GetStaticProps } from "next"
+import { ThemeProvider, makeStyles } from "@mui/styles"
+import { Container, Typography, Grid } from "@mui/material"
 
 import PageTemplate from "../../components/layouts/PageTemplate"
 import theme from "../../components/utils/theme"
-import { fetchArchivePosts, ArchivePost } from "../../lib/api"
+import ShareButton from "../../components/utils/ShareButton"
+
+import { fetchArchivePosts, fetchArchivePostById } from "../../lib/api"
 import moment from "moment"
 
 const useStyles = makeStyles(() => ({
@@ -18,137 +16,143 @@ const useStyles = makeStyles(() => ({
     maxWidth: "800px",
     overflow: "hidden"
   },
-  title: {
-    fontWeight: 'bold', 
-    borderBottom: '4px solid #c07667', // 佐吉翁に学ぶ会のテラコッタ色
-    paddingBottom: '10px', 
-    marginBottom: '3rem'
+  imageWrapper: {
+    marginTop: "1.5rem",
+    marginBottom: "1.5rem",
   },
-  card: {
-    borderRadius: '8px', 
-    boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
-    marginBottom: '24px'
+  archiveImage: {
+    height: "200px", // 👈 高さを200pxに統一（お好みで調整してください）
+    width: "100%",
+    borderRadius: "8px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    objectFit: "cover" // 👈 縦横比が違う画像も、枠に合わせて綺麗に切り
   },
-  btn: {
-    borderRadius: '20px',
-    textTransform: 'none'
+  bodyContent: {
+    marginTop: "2rem",
+    lineHeight: 1.8,
+    fontSize: "1.05rem",
+    "& img": {
+      maxWidth: "100%",
+      height: "auto"
+    }
   }
 }))
 
-interface Props {
-  archives: ArchivePost[]
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await fetchArchivePosts()
+  if (!posts || posts.length === 0) {
+    return { paths: [], fallback: "blocking" }
+  }
+  const paths = posts.map((post) => ({ params: { id: post.id } }))
+  return { paths, fallback: "blocking" }
 }
 
-const ArchivePage = ({ archives }: Props) => {
-  const classes = useStyles()
-  
-  // ファイル形式に応じた外部ファイル用ボタン
-  const renderFileButton = (item: ArchivePost) => {
-    const fileTypeValue = typeof item.fileType === 'string' ? item.fileType : '';
-    const hasDriveFile = !!(item.driveUrl && item.fileType && item.fileType !== 'none');
-    if (!hasDriveFile || !item.driveUrl) return null;
-    // 50行目付近の修正例
-    //const fileTypeValue = typeof item.fileType === 'object' ? item.fileType.id : item.fileType;
-    const isPdf = fileTypeValue?.toLowerCase() === 'pdf';
-    //const isPdf = item.fileType?.toLowerCase() === 'pdf';
-    
-    return (
-      <Button
-        variant="outlined"
-        color="inherit"
-        href={item.driveUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        startIcon={isPdf ? <PictureAsPdfIcon style={{ color: '#dc2626' }} /> : <DescriptionIcon style={{ color: '#16a34a' }} />}
-        className={classes.btn}
-        style={{ borderColor: '#d1d5db' }}
-      >
-        資料ダウンロード 
-      </Button>
-    )
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const id = String(params?.id)
+  const post = await fetchArchivePostById(id)
+  if (!post) return { notFound: true }
+  return { props: { post }, revalidate: 1 }
+}
+
+interface ArchivePostData {
+  post: {
+    id: string
+    title: string
+    publishedAt: string
+    createdAt: string
+    // 💡 imageが「単一オブジェクト」か「配列」のどちらでも許容する設定
+    images?: any 
+    body?: string
   }
+}
+
+// 💡 [id].tsx の「const ArchiveId = ...」からファイルの最後までを、これに丸ごと差し替えて上書き保存してください。
+
+// 💡 [id].tsx の「const ArchiveId = ...」からファイルの最後までを、これに丸ごと差し替えて上書き保存してください。
+
+const ArchiveId = ({ post }: ArchivePostData) => {
+  const classes = useStyles()
+  const displayDate = post.publishedAt || post.createdAt
+
+  const getImagesArray = () => {
+    if (!post.images) return []
+    if (Array.isArray(post.images)) return post.images
+    if (post.images.fieldId && Array.isArray(post.images.images)) return post.images.images
+    if (post.images.url) return [post.images]
+    return []
+  }
+  
+  const images = getImagesArray()
 
   return (
     <ThemeProvider theme={theme}>
-      {/* システム共通のテンプレートで囲み、Header/Footerを自動適用 */}
-      <PageTemplate title="資料室（アーカイブ） | 佐吉翁に学ぶ会">
+      <PageTemplate title={`${post.title} | 資料室（アーカイブ）`}>
         <Container className={classes.container}>
-          {/* ページタイトル */}
-          <Typography variant="h1" className={classes.title}>
-            活動アーカイブ・資料室
-          </Typography>
+          <Grid container direction="column" spacing={3}>
+            <Grid item>
+              <Typography variant="h1">{post.title}</Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="textSecondary">
+                {moment(displayDate).format("MMMM Do YYYY")}
+              </Typography>
+            </Grid>
 
-          {/* 記事一覧ループ */}
-          {archives.map((item) => {
-            const hasDriveFile = !!(item.driveUrl && item.fileType && item.fileType !== 'none');
-            const displayDate = item.publishedAt || item.createdAt;
+            {images.length > 0 && (
+              <Grid item className={classes.imageWrapper}>
+                <Grid container direction="row" spacing={2}>
+                  {images.map((img: any, index: number) => {
+                    let imageUrl = "";
 
-            return (
-              <Card key={item.id} variant="outlined" className={classes.card}>
-                <CardContent style={{ padding: '24px' }}>
-                  
-                  {/* メタ情報（日付 ＆ 分類バッジ） */}
-                  <Box display="flex" alignItems="center" gap="12px" marginBottom="12px">
-                    <Typography color="textSecondary">
-                      {moment(displayDate).format("YYYY年MM月DD日")}
-                    </Typography>
-                    <Chip 
-                      label={hasDriveFile ? '配布資料' : 'ブログ'} 
-                      size="small"
-                      style={{ 
-                        backgroundColor: hasDriveFile ? '#f3f4f6' : '#fef2f2', 
-                        color: hasDriveFile ? '#4b5563' : '#991b1b',
-                        fontWeight: 'bold',
-                        borderRadius: '4px'
-                      }} 
-                    />
-                  </Box>
+                    if (typeof img === 'string') {
+                      imageUrl = img;
+                    } else if (img && typeof img === 'object') {
+                      if (img.url) {
+                        imageUrl = img.url;
+                      } else if (img.image && img.image.url) {
+                        imageUrl = img.image.url;
+                      }
+                    }
 
-                  {/* 記事タイトル */}
-                  <Typography variant="h2" style={{ fontWeight: 'bold', marginBottom: '12px' }}>
-                    {item.title}
-                  </Typography>
+                    if (!imageUrl) return null;
 
-                  {/* 簡単な説明文 */}
-                  <Typography variant="body1" color="textSecondary" style={{ marginBottom: '20px', lineHeight: 1.6 }}>
-                    {item.description || '活動の記録・詳細をご覧いただけます。'}
-                  </Typography>
+                    return (
+                      <Grid item xs={4} key={index}>
+                        <img 
+                          src={imageUrl} 
+                          alt={`${post.title} - ${index + 1}`} 
+                          className={classes.archiveImage} 
+                        />
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
+        </Container>
 
-                  {/* アクションボタン */}
-                  <Box display="flex" flexWrap="wrap" gap="12px">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      href={`/archive/${item.id}`}
-                      endIcon={<ArrowForwardIcon />}
-                      className={classes.btn}
-                      style={{ fontWeight: 'bold' }}
-                    >
-                      記事を読む
-                    </Button>
-                    {renderFileButton(item)}
-                  </Box>
+        <Container className={classes.container}>
+          <Grid container direction="column" alignItems="center">
+            <Grid item>
+              <ShareButton url={`https://<デプロイ後のドメイン>/archive/${post.id}`} />
+            </Grid>
+          </Grid>
+        </Container>
 
-                </CardContent>
-              </Card>
-            )
-          })}
+        <Container className={classes.container}>
+          <Grid container direction="column">
+            <Grid item>
+              <div
+                className={classes.bodyContent}
+                dangerouslySetInnerHTML={{ __html: `${post.body || ''}` }}
+              />
+            </Grid>
+          </Grid>
         </Container>
       </PageTemplate>
     </ThemeProvider>
   )
 }
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  const posts = await fetchArchivePosts()
-
-  return {
-    props: {
-      archives: posts || [],
-    },
-    revalidate: 60,
-  }
-}
-
-// 💡 エラーの原因だったデフォルトエクスポートをシステムと統一
-export default ArchivePage
+export default ArchiveId
