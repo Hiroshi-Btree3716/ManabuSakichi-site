@@ -31,10 +31,10 @@ const Company: React.FC = () => {
   const about: About = {
     name: "正式名称：佐吉翁に学ぶ会",
     founded: "設立日　：2018/05/01",
-    advisor: "顧問　　：三上　元　",
+    advisor: "顧問　　：三上　元",
     ceo: "会長　　：小池　力",
     vice: "副会長　：小野田　冨康",
-    Acountant: "会計　　：野末　高広",
+    Acountant: "会計　　：野末　高弘",
     Secretariant: "事務担当：鈴木　弘",
     address: "所在地　：静岡県湖西市坊瀬",
     service: "活動内容：佐吉翁を語る会運営　佐吉検定、佐吉翁を語る会講演会、佐吉翁の足跡をめぐる研修旅行",
