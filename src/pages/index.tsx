@@ -78,7 +78,7 @@ const Home = ({ latestPosts }) => {
     {
       title: "佐吉翁に学ぶ会とは",
       description: "佐吉翁に学ぶ会の設立経緯、設立趣旨、入会方法の3点について、詳説します。",
-      action: "About  Sakichi Toyoda Learning Society　",
+      action: "About  Sakichi Toyota Learning Society　",
       href: "/service"
     },
     {
