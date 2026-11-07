@@ -35,7 +35,7 @@ const Company: React.FC = () => {
     ceo: "会長　　：小池　力",
     vice: "副会長　：小野田　冨康",
     Acountant: "会計　　：野末　高弘",
-    Secretariant: "事務担当：鈴木　弘",
+    Secretariant: "事務担当：鈴木　弘　伊神　雄一",
     address: "所在地　：静岡県湖西市坊瀬",
     service: "活動内容：佐吉翁を語る会運営　佐吉検定、佐吉翁を語る会講演会、佐吉翁の足跡をめぐる研修旅行",
     mail: "メール　：hiroshi.btree@gmail.com",
