@@ -113,7 +113,7 @@ const Home = ({ latestPosts }) => {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <PageTemplate title="Home | Corporate Site Sample">
+        <PageTemplate title="Home | 佑吉翁に学ぶ会">
           <>
             {/* 
               改造ポイント: items配列にimageを追加しました。
